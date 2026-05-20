@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Room Room VOL.26 — 展覽地圖</title>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Noto+Serif+TC:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  @font-face {
+    font-family: 'JFLanYangMing';
+    src: url('jf-lanyangming-2_0-book.otf') format('opentype');
+    font-weight: 400;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #f0ede8; --surface: #f7f5f1;
+    --border: #c8c4bc; --green: #4a6860; --green-lt: #8fa89e;
+    --text: #1e1c19; --sub: #9a9690; --muted: #b0ada6;
+  }
+  html, body { background: var(--bg); font-family: 'JFLanYangMing','Noto Serif TC',serif; }
+
+  .site-header {
+    background: var(--surface);
+    border-bottom: 0.5px solid var(--border);
+    padding: 1rem 2rem;
+    display: flex; flex-direction: column; align-items: center; gap: 0.4rem;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .site-header img { height: 24px; width: auto; }
+  .header-meta {
+    font-family: 'EB Garamond', serif; font-style: italic;
+    font-size: 11px; letter-spacing: 0.12em; color: var(--sub);
+  }
+
+  .floor-tabs {
+    display: flex; border-bottom: 0.5px solid var(--border);
+    background: var(--surface); justify-content: center;
+  }
+  .tab-btn {
+    font-family: 'EB Garamond', serif; font-size: 15px;
+    padding: 0.6rem 2rem; border: none; background: transparent;
+    color: var(--sub); cursor: pointer; letter-spacing: 0.1em;
+    border-bottom: 2px solid transparent; transition: all 0.2s;
+  }
+  .tab-btn:hover { color: var(--text); }
+  .tab-btn.active { color: var(--green); border-bottom-color: var(--green); }
+
+  .floor-panel { display: none; padding: 1.25rem; }
+  .floor-panel.active { display: block; }
+
+  .map-wrap {
+    position: relative; width: 100%; max-width: 960px; margin: 0 auto;
+  }
+  .map-wrap img { width: 100%; height: auto; display: block; border-radius: 8px; }
+
+  .hotspot {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    cursor: pointer;
+    text-decoration: none;
+    z-index: 10;
+  }
+  .hotspot-circle {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    background: rgba(255,255,255,0);
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+  }
+  .hotspot:hover .hotspot-circle {
+    background: rgba(74,104,96,0.2);
+    border-color: var(--green);
+  }
+  .hotspot.has-audio .hotspot-circle {
+    border-color: var(--green-lt);
+    background: rgba(143,168,158,0.15);
+  }
+  .hotspot.has-audio:hover .hotspot-circle {
+    background: rgba(74,104,96,0.28);
+    border-color: var(--green);
+  }
+  .hotspot. .hotspot-circle {
+    border-color: #d85a30;
+    background: rgba(216,90,48,0.1);
+  }
+
+  .tooltip {
+    position: absolute;
+    bottom: calc(100% + 6px);
+    left: 50%; transform: translateX(-50%);
+    background: var(--text); color: #f5f2ed;
+    font-size: 11px;
+    font-family: 'JFLanYangMing','Noto Serif TC',serif;
+    letter-spacing: 0.04em; white-space: nowrap;
+    padding: 4px 10px; border-radius: 20px;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.18s; z-index: 20;
+  }
+  .hotspot:hover .tooltip { opacity: 1; }
+
+  .legend {
+    max-width: 960px; margin: 0.75rem auto 0;
+    display: flex; gap: 1.25rem; padding: 0 0.25rem;
+    font-size: 11px; color: var(--sub);
+    font-family: 'EB Garamond', serif; font-style: italic;
+    align-items: center;
+  }
+  .legend-dot {
+    width: 12px; height: 12px; border-radius: 50%;
+    border: 2px solid var(--green-lt);
+    background: rgba(143,168,158,0.15);
+    display: inline-block; margin-right: 4px;
+    vertical-align: middle;
+  }
+  .legend-dot.empty {
+    border-color: var(--border);
+    background: transparent;
+  }
+
+  .site-footer {
+    text-align: center; padding: 2rem;
+    font-family: 'EB Garamond', serif; font-style: italic;
+    font-size: 12px; color: var(--muted); letter-spacing: 0.1em;
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <img src="data:image/gif;base64,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" alt="Room Room">
+  <div class="header-meta">VOL.26 &nbsp;·&nbsp; June 13–14, 2026 &nbsp;·&nbsp; 物之相遇，場景之詩</div>
+</header>
+
+<div class="floor-tabs">
+  <button class="tab-btn active" onclick="showFloor('9f',this)">9F</button>
+  <button class="tab-btn" onclick="showFloor('10f',this)">10F</button>
+  <button class="tab-btn" onclick="showFloor('11f',this)">11F</button>
+  <button class="tab-btn" onclick="showFloor('12f',this)">12F</button>
+</div>
+<div class="floor-panel active" id="floor-9f">
+<div class="map-wrap">
+<img src="map-9f.png" alt="9F 平面圖">
+<a class="hotspot has-audio " href="./02-abandon-beauty/" target="_blank" style="left:49.7%;top:54.4%;">
+  <div class="hotspot-circle"></div>
+  <div class="tooltip">No.2 Abandon' beauty</div>
+</a>
+<a class="hotspot  " href="#"  style="left:39.7%;top:56.1%;">
+  <div class="hotspot-circle"></div>
+  <div class="tooltip">No.1 기쁜소식 cafekiso</div>
+</a>
+<a class="hotspot has-audio " href="./03-seoseo/"  style="left:45.0%;top:81.0%;">
+  <div class="hotspot-circle"></div>
+  <div class="tooltip">No.3 seoseo</div>
+</a>
+<a class="hotspot  " href="#"  style="left:55.7%;top:79.9%;">
+  <div class="hotspot-circle"></div>
+  <div class="tooltip">No.4 sleepinthewaves</div>
+</a>
+<a class="hotspot  " href="#"  style="left:65.8%;top:75.6%;">
+  <div class="hotspot-circle"></div>
+  <div class="tooltip">No.5 saltworks</div>
+</a>
+<a class="hotspot  " href="#"  style="left:77.4%;top:71.3%;">
+  <div class="hotspot-circle"></div>
+  <div class="tooltip">No.6 sucre.</div>
+</a>
+<a class="hotspot  " href="#"  style="left:67.0%;top:51.9%;">
+  <div class="hotspot-circle"></div>
+  <div class="tooltip">No.7 anna urata</div>
+</a>
+<a class="hotspot  " href="#"  style="left:61.9%;top:32.4%;">
+  <div class="hotspot-circle"></div>
+  <div class="tooltip">No.8 maromi</div>
+</a>
+<a class="hotspot  " href="#"  style="left:45.9%;top:29.3%;">
+  <div class="hotspot-circle"></div>
+  <div class="tooltip">No.9 HANS Leatehrcraft</div>
+</a>
+<a class="hotspot  " href="#"  style="left:25.6%;top:23.2%;">
+  <div class="hotspot-circle"></div>
+  <div class="tooltip">No.10 Norman Normal x 納雨春春</div>
+</a>
+<a class="hotspot  " href="#"  style="left:61.2%;top:43.7%;">
+  <div class="hotspot-circle"></div>
+  <div class="tooltip">No.13 RAGGOODS</div>
+</a>
+<a class="hotspot  " href="#"  style="left:53.8%;top:24.1%;">
+  <div class="hotspot-circle"></div>
+  <div class="tooltip">No.14 富美桂</div>
+</a>
+<a class="hotspot  " href="#"  style="left:77.8%;top:48.0%;">
+  <div class="hotspot-circle"></div>
+  <div class="tooltip">No.15 享茶作座</div>
+</a>
+<a class="hotspot  " href="#"  style="left:70.8%;top:33.6%;">
+  <div class="hotspot-circle"></div>
+  <div class="tooltip">No.16 Hyesung park</div>
+</a>
+<a class="hotspot  " href="#"  style="left:71.7%;top:60.2%;">
+  <div class="hotspot-circle"></div>
+  <div class="tooltip">No.63 白雨絲光</div>
+</a>
+</div>
+<div class="legend">
+  <span><span class="legend-dot"></span>已有音檔</span>
+  <span><span class="legend-dot empty"></span>尚未上傳</span>
+</div>
+</div>
+<div class="floor-panel " id="floor-10f">
+<div class="map-wrap">
+<img src="map-10f.png" alt="10F 平面圖">
+<a class="hotspot  " href="#"  style="left:39.9%;top:56.8%;">
+  <div class="hotspot-circle"></div>
+  <div class="tooltip">No.19 ZIIDOstudio x Lee Jungbeen</div>
+</a>
+<a class="hotspot  " href="#"  style="left:49.8%;top:54.6%;">
+  <div class="hotspot-circle"></div>
+  <div class="tooltip">No.20 茄子 rukoo</div>
+</a>
+<a class="hotspot  " href="#"  style="left:45.2%;top:81.4%;">
+  <div class="hotspot-circle"></div>
+  <div class="tooltip">No.21 SUSU.illustration</div>
+</a>
+<a class="hotspot  " href="#"  style="left:56.0%;top:80.3%;">
+  <div class="hotspot-circle"></div>
+  <div class="tooltip">No.22 OAGE</div>
+</a>
+<a class="hotspot  " href="#"  style="left:66.4%;top:76.0%;">
+  <div class="hotspot-circle"></div>
+  <div class="tooltip">No.23 ONE DAY ONE DOG</div>
+</a>
+<a class="hotspot  " href="#"  style="left:78.0%;top:71.5%;">
+  <div class="hotspot-circle"></div>
+  <div class="tooltip">No.24 RImake</div>
+</a>
+<a class="hotspot  " href="#"  style="left:66.9%;top:52.8%;">
+  <div class="hotspot-circle"></div>
+  <div class="tooltip">No.25 quartzceramic x 언담</div>
+</a>
+<a class="hotspot  " href="#"  style="left:62.3%;top:32.2%;">
+  <div class="hotspot-circle"></div>
+  <div class="tooltip">No.26 anna terada</div>
+</a>
+<a class="hotspot  " href="#"  style="left:45.8%;top:29.5%;">
+  <div class="hotspot-circle"></div>
+  <div class="tooltip">No.27 MUU</div>
+</a>
+<a class="hotspot  " href="#"  style="left:24.9%;top:22.7%;">
+  <div class="hotspot-circle"></div>
+  <div class="tooltip">No.28 my m x SAYOKO OZAWA</div>
+</a>
+<a class="hotspot  " href="#"  style="left:51.3%;top:45.8%;">
+  <div class="hotspot-circle"></div>
+  <div class="tooltip">No.29 至土</div>
+</a>
+<a class="hotspot  " href="#"  style="left:54.1%;top:32.7%;">
+  <div class="hotspot-circle"></div>
+  <div class="tooltip">No.30 舒 Su Felting</div>
+</a>
+<a class="hotspot  " href="#"  style="left:61.1%;top:43.9%;">
+  <div class="hotspot-circle"></div>
+  <div class="tooltip">No.31 籽苑</div>
+</a>
+<a class="hotspot  " href="#"  style="left:76.2%;top:44.9%;">
+  <div class="hotspot-circle"></div>
+  <div class="tooltip">No.33 老3香室</div>
+</a>
+<a class="hotspot  " href="#"  style="left:69.7%;top:32.5%;">
+  <div class="hotspot-circle"></div>
+  <div class="tooltip">No.34 sonseeun ceramics</div>
+</a>
+<a class="hotspot  " href="#"  style="left:41.3%;top:19.8%;">
+  <div class="hotspot-circle"></div>
+  <div class="tooltip">No.35 乡川甜點 River Patisserie x 樹皮小姐</div>
+</a>
+<a class="hotspot  " href="#"  style="left:71.6%;top:60.7%;">
+  <div class="hotspot-circle"></div>
+  <div class="tooltip">No.36 The Yen - 顏謹制</div>
+</a>
+</div>
+<div class="legend">
+  <span><span class="legend-dot"></span>已有音檔</span>
+  <span><span class="legend-dot empty"></span>尚未上傳</span>
+</div>
+</div>
+<div class="floor-panel " id="floor-11f">
+<div class="map-wrap">
+<img src="map-11f.png" alt="11F 平面圖">
+<a class="hotspot  " href="#"  style="left:40.0%;top:56.2%;">
+  <div class="hotspot-circle"></div>
+  <div class="tooltip">No.37 JI SEUNG MIN x DAN YOU BIN</div>
+</a>
+<a class="hotspot  " href="#"  style="left:50.2%;top:54.8%;">
+  <div class="hotspot-circle"></div>
+  <div class="tooltip">No.38 Shuku</div>
+</a>
+<a class="hotspot  " href="#"  style="left:45.7%;top:81.4%;">
+  <div class="hotspot-circle"></div>
+  <div class="tooltip">No.39 Second Chance : Art Stamp</div>
+</a>
+<a class="hotspot  " href="#"  style="left:55.9%;top:80.7%;">
+  <div class="hotspot-circle"></div>
+  <div class="tooltip">No.40 HIBIWA</div>
+</a>
+<a class="hotspot  " href="#"  style="left:66.2%;top:76.0%;">
+  <div class="hotspot-circle"></div>
+  <div class="tooltip">No.41 PAPIRLAB｜紙間</div>
+</a>
+<a class="hotspot  " href="#"  style="left:78.1%;top:71.3%;">
+  <div class="hotspot-circle"></div>
+  <div class="tooltip">No.42 yosefu</div>
+</a>
+<a class="hotspot  " href="#"  style="left:66.4%;top:52.8%;">
+  <div class="hotspot-circle"></div>
+  <div class="tooltip">No.43 石川史</div>
+</a>
+<a class="hotspot  " href="#"  style="left:62.0%;top:32.5%;">
+  <div class="hotspot-circle"></div>
+  <div class="tooltip">No.44 a letter from</div>
+</a>
+<a class="hotspot  " href="#"  style="left:46.1%;top:29.7%;">
+  <div class="hotspot-circle"></div>
+  <div class="tooltip">No.45 Orwecanfullloveシ</div>
+</a>
+<a class="hotspot  " href="#"  style="left:25.3%;top:23.9%;">
+  <div class="hotspot-circle"></div>
+  <div class="tooltip">No.46 GROBJECT</div>
+</a>
+<a class="hotspot  " href="#"  style="left:51.1%;top:45.3%;">
+  <div class="hotspot-circle"></div>
+  <div class="tooltip">No.47 PTT POTTERY</div>
+</a>
+<a class="hotspot  " href="#"  style="left:54.0%;top:33.3%;">
+  <div class="hotspot-circle"></div>
+  <div class="tooltip">No.48 OuO (Once Upon Object)</div>
+</a>
+<a class="hotspot  " href="#"  style="left:62.2%;top:44.6%;">
+  <div class="hotspot-circle"></div>
+  <div class="tooltip">No.49 風谷 fungus</div>
+</a>
+<a class="hotspot  " href="#"  style="left:71.7%;top:60.4%;">
+  <div class="hotspot-circle"></div>
+  <div class="tooltip">No.51 白日造夢 Day by Dream</div>
+</a>
+<a class="hotspot  " href="#"  style="left:76.0%;top:44.9%;">
+  <div class="hotspot-circle"></div>
+  <div class="tooltip">No.52 canaan</div>
+</a>
+<a class="hotspot  " href="#"  style="left:70.4%;top:36.8%;">
+  <div class="hotspot-circle"></div>
+  <div class="tooltip">No.53 Muzhi Meet 沐植覓物</div>
+</a>
+<a class="hotspot  " href="#"  style="left:51.9%;top:16.9%;">
+  <div class="hotspot-circle"></div>
+  <div class="tooltip">No.54 KIKONO</div>
+</a>
+</div>
+<div class="legend">
+  <span><span class="legend-dot"></span>已有音檔</span>
+  <span><span class="legend-dot empty"></span>尚未上傳</span>
+</div>
+</div>
+<div class="floor-panel " id="floor-12f">
+<div class="map-wrap">
+<img src="map-12f.png" alt="12F 平面圖">
+<a class="hotspot  " href="#"  style="left:44.8%;top:81.0%;">
+  <div class="hotspot-circle"></div>
+  <div class="tooltip">No.55 정지원 (jiwon jung)</div>
+</a>
+<a class="hotspot  " href="#"  style="left:55.9%;top:79.4%;">
+  <div class="hotspot-circle"></div>
+  <div class="tooltip">No.56 草木染め衣 shanti shanti shanti</div>
+</a>
+<a class="hotspot  " href="#"  style="left:65.4%;top:76.2%;">
+  <div class="hotspot-circle"></div>
+  <div class="tooltip">No.57 ennju</div>
+</a>
+<a class="hotspot  " href="#"  style="left:77.3%;top:71.0%;">
+  <div class="hotspot-circle"></div>
+  <div class="tooltip">No.58 AKO DOMAE</div>
+</a>
+<a class="hotspot  " href="#"  style="left:49.7%;top:54.8%;">
+  <div class="hotspot-circle"></div>
+  <div class="tooltip">No.59 Emerald Studio</div>
+</a>
+<a class="hotspot  " href="#"  style="left:66.3%;top:52.5%;">
+  <div class="hotspot-circle"></div>
+  <div class="tooltip">No.60 kojimayuzuho</div>
+</a>
+<a class="hotspot  " href="#"  style="left:61.6%;top:33.1%;">
+  <div class="hotspot-circle"></div>
+  <div class="tooltip">No.61 030workroom</div>
+</a>
+<a class="hotspot  " href="#"  style="left:59.6%;top:44.2%;">
+  <div class="hotspot-circle"></div>
+  <div class="tooltip">No.62 Busy Fingers</div>
+</a>
+<a class="hotspot  " href="#"  style="left:78.7%;top:55.2%;">
+  <div class="hotspot-circle"></div>
+  <div class="tooltip">No.64 かわかみ茶葉店</div>
+</a>
+<a class="hotspot  " href="#"  style="left:70.8%;top:38.6%;">
+  <div class="hotspot-circle"></div>
+  <div class="tooltip">No.65 damda</div>
+</a>
+<a class="hotspot  " href="#"  style="left:54.9%;top:17.8%;">
+  <div class="hotspot-circle"></div>
+  <div class="tooltip">No.66 Ruder' Cafe</div>
+</a>
+<a class="hotspot  " href="#"  style="left:48.1%;top:31.5%;">
+  <div class="hotspot-circle"></div>
+  <div class="tooltip">No.68 Parkkitchen</div>
+</a>
+</div>
+<div class="legend">
+  <span><span class="legend-dot"></span>已有音檔</span>
+  <span><span class="legend-dot empty"></span>尚未上傳</span>
+</div>
+</div>
+
+<footer class="site-footer">Room Room &nbsp;·&nbsp; 2026 &nbsp;·&nbsp; Meeting of Objects: A Poem of Living Scenes.</footer>
+
+<script>
+function showFloor(f, btn) {
+  document.querySelectorAll('.floor-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('floor-' + f).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+</body>
+</html>
