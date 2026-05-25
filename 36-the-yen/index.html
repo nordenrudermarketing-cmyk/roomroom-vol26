@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>The Yen 顏謹制 — Room Room</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Noto+Serif+TC:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  @font-face { font-family: 'JFLanYangMing'; src: url('../jf-lanyangming-2_0-book.otf') format('opentype'); font-weight: 400; }
+  @font-face { font-family: 'JFLanYangMing'; src: url('../jf-lanyangming-2_0-semibold.otf') format('opentype'); font-weight: 600; }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { --bg:#e8ebe6; --surface:#f5f2ed; --card:#edeae3; --border:#c8c4bc; --green:#4a6860; --green-lt:#8fa89e; --text:#1e1c19; --sub:#9a9690; --muted:#b0ada6; }
+  html,body { min-height:100%; background:var(--bg); }
+  body { font-family:'JFLanYangMing','Noto Serif TC',serif; display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:100vh; padding:2rem 1.25rem; }
+  .card { background:var(--surface); border-radius:20px; border:0.5px solid var(--border); width:100%; max-width:400px; padding:2rem 1.75rem; display:flex; flex-direction:column; gap:1.5rem; }
+  .logo-area { display:flex; justify-content:center; padding-bottom:1.25rem; border-bottom:0.5px solid var(--border); }
+  .logo-area img { height:28px; width:auto; }
+  .brand { display:flex; flex-direction:column; gap:4px; }
+  .room-no { font-family:'EB Garamond',serif; font-style:italic; font-size:11px; letter-spacing:0.18em; color:var(--sub); }
+  .brand-name { font-family:'EB Garamond',serif; font-size:22px; font-weight:500; color:var(--text); letter-spacing:0.02em; line-height:1.2; }
+  .brand-name-zh { font-family:'JFLanYangMing','Noto Serif TC',serif; font-size:12px; font-weight:400; color:var(--sub); letter-spacing:0.12em; margin-top:2px; }
+  .subtitle-box { background:var(--card); border:0.5px solid var(--border); border-radius:8px; padding:1.25rem 1.25rem 1.25rem 1.5rem; min-height:110px; display:flex; flex-direction:column; justify-content:center; gap:8px; position:relative; transition:border-color 0.4s ease; }
+  .subtitle-box::before { content:''; position:absolute; left:0; top:20%; bottom:20%; width:2px; background:var(--green-lt); border-radius:2px; opacity:0; transition:opacity 0.4s ease; }
+  .subtitle-box.active { border-color:var(--green-lt); }
+  .subtitle-box.active::before { opacity:1; }
+  .sub-idle { font-family:'EB Garamond',serif; font-style:italic; font-size:13px; color:var(--muted); text-align:center; letter-spacing:0.04em; }
+  .sub-text { font-family:'JFLanYangMing','Noto Serif TC',serif; font-size:14px; font-weight:400; color:var(--text); line-height:1.85; letter-spacing:0.06em; display:none; }
+  .player { display:flex; flex-direction:column; align-items:center; gap:14px; }
+  .progress-row { width:100%; display:flex; align-items:center; gap:10px; }
+  .progress-bar { flex:1; height:1px; background:var(--border); border-radius:1px; cursor:pointer; position:relative; }
+  .progress-fill { position:absolute; left:0; top:0; height:100%; background:var(--green); border-radius:1px; width:0%; transition:width 0.1s linear; }
+  .time-display { font-family:'EB Garamond',serif; font-size:12px; color:var(--sub); letter-spacing:0.06em; min-width:30px; text-align:right; }
+  .play-btn { width:50px; height:50px; border-radius:50%; border:0.5px solid var(--green); background:transparent; color:var(--green); cursor:pointer; display:flex; align-items:center; justify-content:center; transition:background 0.2s ease; -webkit-tap-highlight-color:transparent; }
+  .play-btn:hover { background:rgba(74,104,96,0.08); }
+  .play-btn svg { width:18px; height:18px; fill:currentColor; }
+  .play-btn .icon-pause { display:none; }
+  .play-btn.playing .icon-play { display:none; }
+  .play-btn.playing .icon-pause { display:block; }
+  .footer { font-family:'EB Garamond',serif; font-style:italic; font-size:11px; color:var(--muted); text-align:center; letter-spacing:0.1em; border-top:0.5px solid var(--border); padding-top:0.75rem; }
+  audio { display:none; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo-area"><img src="data:image/gif;base64,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" alt="Room Room"></div>
+  <div class="brand">
+    <div class="room-no">Room 36</div>
+    <div class="brand-name">The Yen</div>
+    <div class="brand-name-zh">顏謹制</div>
+  </div>
+  <div class="subtitle-box" id="subtitleBox">
+    <p class="sub-idle" id="idleMsg">按下播放，聆聽品牌介紹</p>
+    <p class="sub-text" id="subText"></p>
+  </div>
+  <div class="player">
+    <div class="progress-row">
+      <div class="progress-bar" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
+      <span class="time-display" id="timeDisplay">—</span>
+    </div>
+    <button class="play-btn" id="playBtn" aria-label="播放">
+      <svg class="icon-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+      <svg class="icon-pause" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+    </button>
+  </div>
+  <div class="footer">2026 &nbsp;·&nbsp; 物之相遇，場景之詩</div>
+</div>
+<audio id="audio" src="the-yen.m4a" preload="metadata"></audio>
+<script>
+const cues = [
+  { start:0.5, end:10.0, text:'拂過柳梢的晚風、雨水在葉尖滴落的瞬間、落英紛飛的一刻，捕捉日常中的詩意凝練成優雅的飾物。' },
+  { start:10.0, end:18.0, text:'您好，我是 The Yen 顏謹制。' },
+  { start:18.0, end:31.0, text:'希望作品細緻靜謐的氛圍，不論是平凡或盛裝的日子都能成為溫柔的陪伴，與你們一起度過許多愉快時光。' }
+];
+const audio=document.getElementById('audio');
+const playBtn=document.getElementById('playBtn');
+const progressBar=document.getElementById('progressBar');
+const progressFill=document.getElementById('progressFill');
+const timeDisplay=document.getElementById('timeDisplay');
+const subtitleBox=document.getElementById('subtitleBox');
+const idleMsg=document.getElementById('idleMsg');
+const subText=document.getElementById('subText');
+function fmtTime(s){ if(isNaN(s)||s<0)return'—'; return Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0'); }
+function updateSubtitle(t){
+  const cue=cues.find(c=>t>=c.start&&t<c.end);
+  if(cue){ idleMsg.style.display='none'; subText.style.display='block'; subText.innerHTML=cue.text; subtitleBox.classList.add('active'); }
+  else{ subText.style.display='none'; idleMsg.style.display='block'; idleMsg.textContent=audio.ended?'播放結束':'按下播放，聆聽品牌介紹'; subtitleBox.classList.remove('active'); }
+}
+playBtn.addEventListener('click',()=>{ if(audio.paused){ audio.play(); playBtn.classList.add('playing'); } else{ audio.pause(); playBtn.classList.remove('playing'); } });
+audio.addEventListener('timeupdate',()=>{ const pct=audio.duration?(audio.currentTime/audio.duration)*100:0; progressFill.style.width=pct+'%'; timeDisplay.textContent=fmtTime(audio.duration-audio.currentTime); updateSubtitle(audio.currentTime); });
+audio.addEventListener('loadedmetadata',()=>{ timeDisplay.textContent=fmtTime(audio.duration); });
+audio.addEventListener('ended',()=>{ playBtn.classList.remove('playing'); progressFill.style.width='100%'; updateSubtitle(999); });
+progressBar.addEventListener('click',(e)=>{ if(!audio.duration)return; const rect=progressBar.getBoundingClientRect(); audio.currentTime=((e.clientX-rect.left)/rect.width)*audio.duration; });
+</script>
+</body>
+</html>
