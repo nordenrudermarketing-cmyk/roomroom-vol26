@@ -9,90 +9,79 @@
 <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Noto+Serif+TC:wght@300;400&family=Noto+Serif+KR:wght@300;400&display=swap" rel="stylesheet">
 <style>
   @font-face { font-family: 'JFLanYangMing'; src: url('../jf-lanyangming-2_0-book.otf') format('opentype'); font-weight: 400; }
-  @font-face { font-family: 'JFLanYangMing'; src: url('../jf-lanyangming-2_0-semibold.otf') format('opentype'); font-weight: 600; }
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root { --bg:#e8ebe6; --surface:#f5f2ed; --card:#edeae3; --border:#c8c4bc; --green:#4a6860; --green-lt:#8fa89e; --text:#1e1c19; --sub:#9a9690; --muted:#b0ada6; }
   html,body { min-height:100%; background:var(--bg); }
   body { font-family:'JFLanYangMing','Noto Serif TC',serif; display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:100vh; padding:2rem 1.25rem; gap:1.5rem; }
-
-  /* 共用 card */
   .card { background:var(--surface); border-radius:20px; border:0.5px solid var(--border); width:100%; max-width:400px; padding:2rem 1.75rem; display:flex; flex-direction:column; gap:1.5rem; }
-
-  /* logo 只在第一個 card 顯示 */
   .logo-area { display:flex; justify-content:center; padding-bottom:1.25rem; border-bottom:0.5px solid var(--border); }
   .logo-area img { height:28px; width:auto; }
-
   .brand { display:flex; flex-direction:column; gap:4px; }
   .room-no { font-family:'EB Garamond',serif; font-style:italic; font-size:11px; letter-spacing:0.18em; color:var(--sub); }
   .brand-name { font-family:'EB Garamond',serif; font-size:22px; font-weight:500; color:var(--text); letter-spacing:0.02em; line-height:1.2; }
-
   .subtitle-box { background:var(--card); border:0.5px solid var(--border); border-radius:8px; padding:1.25rem 1.25rem 1.25rem 1.5rem; min-height:100px; display:flex; flex-direction:column; justify-content:center; gap:8px; position:relative; transition:border-color 0.4s ease; }
   .subtitle-box::before { content:''; position:absolute; left:0; top:20%; bottom:20%; width:2px; background:var(--green-lt); border-radius:2px; opacity:0; transition:opacity 0.4s ease; }
   .subtitle-box.active { border-color:var(--green-lt); }
   .subtitle-box.active::before { opacity:1; }
   .sub-idle { font-family:'EB Garamond',serif; font-style:italic; font-size:13px; color:var(--muted); text-align:center; letter-spacing:0.04em; }
-  .sub-original { font-family:'Noto Serif KR',serif; font-size:12px; font-weight:300; color:var(--sub); line-height:1.8; display:none; }
-  .sub-translation { font-family:'JFLanYangMing','Noto Serif TC',serif; font-size:13.5px; font-weight:400; color:var(--text); line-height:1.85; letter-spacing:0.06em; display:none; }
-
+  .sub-orig { font-family:'Noto Serif KR',serif; font-size:12px; font-weight:300; color:var(--sub); line-height:1.8; display:none; }
+  .sub-trans { font-family:'JFLanYangMing','Noto Serif TC',serif; font-size:13.5px; font-weight:400; color:var(--text); line-height:1.85; letter-spacing:0.06em; display:none; }
   .player { display:flex; flex-direction:column; align-items:center; gap:12px; }
   .progress-row { width:100%; display:flex; align-items:center; gap:10px; }
   .progress-bar { flex:1; height:1px; background:var(--border); border-radius:1px; cursor:pointer; position:relative; }
   .progress-fill { position:absolute; left:0; top:0; height:100%; background:var(--green); border-radius:1px; width:0%; transition:width 0.1s linear; }
-  .time-display { font-family:'EB Garamond',serif; font-size:12px; color:var(--sub); letter-spacing:0.06em; min-width:30px; text-align:right; }
+  .time-display { font-family:'EB Garamond',serif; font-size:12px; color:var(--sub); letter-spacing:0.04em; min-width:28px; text-align:right; }
   .play-btn { width:46px; height:46px; border-radius:50%; border:0.5px solid var(--green); background:transparent; color:var(--green); cursor:pointer; display:flex; align-items:center; justify-content:center; transition:background 0.2s ease; -webkit-tap-highlight-color:transparent; }
   .play-btn:hover { background:rgba(74,104,96,0.08); }
   .play-btn svg { width:16px; height:16px; fill:currentColor; }
   .play-btn .icon-pause { display:none; }
   .play-btn.playing .icon-play { display:none; }
   .play-btn.playing .icon-pause { display:block; }
-
-  .footer { font-family:'EB Garamond',serif; font-style:italic; font-size:11px; color:var(--muted); text-align:center; letter-spacing:0.1em; }
+  .footer { font-family:'EB Garamond',serif; font-style:italic; font-size:11px; color:var(--muted); text-align:center; letter-spacing:0.08em; }
   audio { display:none; }
 </style>
 </head>
 <body>
 
-<!-- ── Quartz Ceramic ── -->
 <div class="card">
   <div class="logo-area"><img src="data:image/gif;base64,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" alt="Room Room"></div>
   <div class="brand">
     <div class="room-no">Room 25</div>
     <div class="brand-name">Quartz Ceramic</div>
   </div>
-  <div class="subtitle-box" id="subBox1">
+  <div class="subtitle-box" id="box1">
     <p class="sub-idle" id="idle1">按下播放，聆聽品牌介紹</p>
-    <p class="sub-original" id="orig1"></p>
-    <p class="sub-translation" id="trans1"></p>
+    <p class="sub-orig" id="orig1"></p>
+    <p class="sub-trans" id="trans1"></p>
   </div>
   <div class="player">
     <div class="progress-row">
       <div class="progress-bar" id="bar1"><div class="progress-fill" id="fill1"></div></div>
       <span class="time-display" id="time1">—</span>
     </div>
-    <button class="play-btn" id="btn1" onclick="togglePlay(1)" aria-label="播放">
+    <button class="play-btn" id="btn1" onclick="toggle(1)" aria-label="播放">
       <svg class="icon-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
       <svg class="icon-pause" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
     </button>
   </div>
 </div>
 
-<!-- ── 언담 ── -->
 <div class="card">
   <div class="brand">
     <div class="room-no">Room 25</div>
     <div class="brand-name">언담 undam</div>
   </div>
-  <div class="subtitle-box" id="subBox2">
+  <div class="subtitle-box" id="box2">
     <p class="sub-idle" id="idle2">按下播放，聆聽品牌介紹</p>
-    <p class="sub-original" id="orig2"></p>
-    <p class="sub-translation" id="trans2"></p>
+    <p class="sub-orig" id="orig2"></p>
+    <p class="sub-trans" id="trans2"></p>
   </div>
   <div class="player">
     <div class="progress-row">
       <div class="progress-bar" id="bar2"><div class="progress-fill" id="fill2"></div></div>
       <span class="time-display" id="time2">—</span>
     </div>
-    <button class="play-btn" id="btn2" onclick="togglePlay(2)" aria-label="播放">
+    <button class="play-btn" id="btn2" onclick="toggle(2)" aria-label="播放">
       <svg class="icon-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
       <svg class="icon-pause" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
     </button>
@@ -101,20 +90,13 @@
 
 <div class="footer">2026 &nbsp;·&nbsp; 物之相遇，場景之詩</div>
 
-<audio id="audio1" src="quartzceramic.m4a" preload="metadata"></audio>
-<audio id="audio2" src="undam.m4a" preload="metadata"></audio>
+<audio id="a1" src="quartzceramic.m4a" preload="metadata"></audio>
+<audio id="a2" src="undam.m4a" preload="metadata"></audio>
 
 <script>
-const players = {
+const data = {
   1: {
-    audio: document.getElementById('audio1'),
-    btn: document.getElementById('btn1'),
-    fill: document.getElementById('fill1'),
-    time: document.getElementById('time1'),
-    box: document.getElementById('subBox1'),
-    idle: document.getElementById('idle1'),
-    orig: document.getElementById('orig1'),
-    trans: document.getElementById('trans1'),
+    audio: null, btn: null, fill: null, time: null, box: null, idle: null, orig: null, trans: null,
     cues: [
       { start:0.5, end:7.0, original:'안녕하세요, Quartz Ceramic입니다. Quartz Ceramic은 사막의 능선에서 보이는 곡선과 자연의 율동감에서 영감을 받아 작업합니다.', translation:'您好，我是 Quartz Ceramic。我們的創作靈感來自沙漠山脊的曲線，以及大自然中富有律動感的形態。' },
       { start:7.0, end:15.0, original:'이번 RoomRoom에서는 이러한 흐름을 담은 테이블웨어를 전시하고 있습니다.', translation:'這次在 RoomRoom 展出中，我們呈現了承載這種流動感的餐桌器皿作品。' },
@@ -122,14 +104,7 @@ const players = {
     ]
   },
   2: {
-    audio: document.getElementById('audio2'),
-    btn: document.getElementById('btn2'),
-    fill: document.getElementById('fill2'),
-    time: document.getElementById('time2'),
-    box: document.getElementById('subBox2'),
-    idle: document.getElementById('idle2'),
-    orig: document.getElementById('orig2'),
-    trans: document.getElementById('trans2'),
+    audio: null, btn: null, fill: null, time: null, box: null, idle: null, orig: null, trans: null,
     cues: [
       { start:0.5, end:7.0, original:'안녕하세요, 언담 입니다. 이번 RoomRoom에서는 분청사기 차도구 작업들을 선보이고 있습니다.', translation:'您好，我是 언담。這次在 RoomRoom，我們展出了粉青沙器的茶器作品。' },
       { start:7.0, end:17.0, original:'저희의 작업은 분청사기 특유의 소박함과 투박한 질감을 중요하게 생각하며, 그 안에서 언담만의 색과 분위기를 담아내고 있습니다.', translation:'我們的創作重視粉青沙器特有的質樸與粗獷質感，並在其中融入屬於「언담」的色彩與氛圍。' },
@@ -138,47 +113,70 @@ const players = {
   }
 };
 
-function fmtTime(s) { if(isNaN(s)||s<0)return'—'; return Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0'); }
+function init() {
+  [1,2].forEach(id => {
+    const d = data[id];
+    d.audio = document.getElementById('a'+id);
+    d.btn   = document.getElementById('btn'+id);
+    d.fill  = document.getElementById('fill'+id);
+    d.time  = document.getElementById('time'+id);
+    d.box   = document.getElementById('box'+id);
+    d.idle  = document.getElementById('idle'+id);
+    d.orig  = document.getElementById('orig'+id);
+    d.trans = document.getElementById('trans'+id);
 
-function updateSub(p, t) {
-  const cue = p.cues.find(c => t >= c.start && t < c.end);
+    d.audio.addEventListener('loadedmetadata', () => { d.time.textContent = fmt(d.audio.duration); });
+    d.audio.addEventListener('timeupdate', () => {
+      const pct = d.audio.duration ? (d.audio.currentTime/d.audio.duration)*100 : 0;
+      d.fill.style.width = pct+'%';
+      d.time.textContent = fmt(d.audio.duration - d.audio.currentTime);
+      updateSub(d);
+    });
+    d.audio.addEventListener('ended', () => {
+      d.btn.classList.remove('playing');
+      updateSub(d);
+    });
+    document.getElementById('bar'+id).addEventListener('click', e => {
+      if (!d.audio.duration) return;
+      const r = document.getElementById('bar'+id).getBoundingClientRect();
+      d.audio.currentTime = ((e.clientX-r.left)/r.width)*d.audio.duration;
+    });
+  });
+}
+
+function fmt(s) { if(isNaN(s)||s<0)return'—'; return Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0'); }
+
+function updateSub(d) {
+  const t = d.audio.currentTime;
+  const cue = d.cues.find(c => t >= c.start && t < c.end);
   if (cue) {
-    p.idle.style.display='none'; p.orig.style.display='block'; p.trans.style.display='block';
-    p.orig.innerHTML=cue.original; p.trans.innerHTML=cue.translation;
-    p.box.classList.add('active');
+    d.idle.style.display = 'none';
+    d.orig.style.display = 'block';
+    d.trans.style.display = 'block';
+    d.orig.innerHTML = cue.original;
+    d.trans.innerHTML = cue.translation;
+    d.box.classList.add('active');
   } else {
-    p.orig.style.display='none'; p.trans.style.display='none'; p.idle.style.display='block';
-    p.idle.textContent = p.audio.ended ? '播放結束' : '按下播放，聆聽品牌介紹';
-    p.box.classList.remove('active');
+    d.idle.style.display = 'block';
+    d.orig.style.display = 'none';
+    d.trans.style.display = 'none';
+    d.idle.textContent = d.audio.ended ? '播放結束' : '按下播放，聆聽品牌介紹';
+    d.box.classList.remove('active');
   }
 }
 
-function togglePlay(id) {
-  const p = players[id];
-  const other = players[id === 1 ? 2 : 1];
-  if (!p.audio.paused) {
-    p.audio.pause(); p.btn.classList.remove('playing');
+function toggle(id) {
+  const d = data[id];
+  const other = data[id===1?2:1];
+  if (!d.audio.paused) {
+    d.audio.pause(); d.btn.classList.remove('playing');
   } else {
     other.audio.pause(); other.btn.classList.remove('playing');
-    p.audio.play(); p.btn.classList.add('playing');
+    d.audio.play(); d.btn.classList.add('playing');
   }
 }
 
-Object.values(players).forEach(p => {
-  p.audio.addEventListener('loadedmetadata', () => { p.time.textContent = fmtTime(p.audio.duration); });
-  p.audio.addEventListener('timeupdate', () => {
-    const pct = p.audio.duration ? (p.audio.currentTime/p.audio.duration)*100 : 0;
-    p.fill.style.width = pct+'%';
-    p.time.textContent = fmtTime(p.audio.duration - p.audio.currentTime);
-    updateSub(p, p.audio.currentTime);
-  });
-  p.audio.addEventListener('ended', () => { p.btn.classList.remove('playing'); updateSub(p, 999); });
-  p.bar.addEventListener('click', e => {
-    if (!p.audio.duration) return;
-    const rect = p.bar.getBoundingClientRect();
-    p.audio.currentTime = ((e.clientX - rect.left) / rect.width) * p.audio.duration;
-  });
-});
+init();
 </script>
 </body>
 </html>
