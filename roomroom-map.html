@@ -8,7 +8,7 @@
 <style>
   @font-face { font-family: 'JFLanYangMing'; src: url('jf-lanyangming-2_0-book.otf') format('opentype'); font-weight: 400; }
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  :root { --bg:#f0ede8; --surface:#f7f5f1; --border:#c8c4bc; --green:#4a6860; --green-lt:#8fa89e; --text:#1e1c19; --sub:#9a9690; --muted:#b0ada6; }
+  :root { --bg:#f0ede8; --surface:#f7f5f1; --border:#c8c4bc; --green:#4a6860; --green-lt:#8fa89e; --text:#1e1c19; --sub:#9a9690; --muted:#b0ada6; --hotspot:#d4dddc; }
   html,body { background:var(--bg); font-family:'JFLanYangMing','Noto Serif TC',serif; }
   .site-header { background:var(--surface); border-bottom:0.5px solid var(--border); padding:1rem 2rem; display:flex; flex-direction:column; align-items:center; gap:0.4rem; position:sticky; top:0; z-index:100; }
   .site-header img { height:24px; width:auto; }
@@ -21,16 +21,37 @@
   .floor-panel.active { display:block; }
   .map-wrap { position:relative; width:100%; max-width:960px; margin:0 auto; }
   .map-wrap img { width:100%; height:auto; display:block; border-radius:8px; }
+
   .hotspot { position:absolute; transform:translate(-50%,-50%); cursor:pointer; text-decoration:none; z-index:10; }
-  .hotspot-circle { width:30px; height:30px; border-radius:50%; border:2px solid transparent; background:rgba(255,255,255,0); display:flex; align-items:center; justify-content:center; transition:all 0.2s; }
-  .hotspot:hover .hotspot-circle { background:rgba(74,104,96,0.2); border-color:var(--green); }
-  .hotspot.has-audio .hotspot-circle { border-color:var(--green-lt); background:rgba(143,168,158,0.15); }
-  .hotspot.has-audio:hover .hotspot-circle { background:rgba(74,104,96,0.28); border-color:var(--green); }
+  .hotspot-circle {
+    width:20px; height:20px;
+    border-radius:50%;
+    border:1.5px solid transparent;
+    background:rgba(255,255,255,0);
+    display:flex; align-items:center; justify-content:center;
+    transition:all 0.2s;
+  }
+  .hotspot:hover .hotspot-circle {
+    background:rgba(212,221,220,0.35);
+    border-color:var(--hotspot);
+  }
+  .hotspot.has-audio .hotspot-circle {
+    border-color:var(--hotspot);
+    background:rgba(212,221,220,0.25);
+  }
+  .hotspot.has-audio:hover .hotspot-circle {
+    background:rgba(212,221,220,0.55);
+    border-color:#6f8796;
+  }
   .tooltip { position:absolute; bottom:calc(100% + 6px); left:50%; transform:translateX(-50%); background:var(--text); color:#f5f2ed; font-size:11px; font-family:'JFLanYangMing','Noto Serif TC',serif; letter-spacing:0.04em; white-space:nowrap; padding:4px 10px; border-radius:20px; opacity:0; pointer-events:none; transition:opacity 0.18s; z-index:20; }
   .hotspot:hover .tooltip { opacity:1; }
-  .legend { max-width:960px; margin:0.75rem auto 0; display:flex; gap:1.25rem; padding:0 0.25rem; font-size:11px; color:var(--sub); font-family:'EB Garamond',serif; font-style:italic; align-items:center; }
-  .legend-dot { width:12px; height:12px; border-radius:50%; border:2px solid var(--green-lt); background:rgba(143,168,158,0.15); display:inline-block; margin-right:4px; vertical-align:middle; }
+
+  .legend { max-width:960px; margin:0.75rem auto 0; display:flex; gap:1.25rem; padding:0 0.25rem; font-size:11px; color:var(--sub); font-family:'JFLanYangMing','Noto Serif TC',serif; align-items:center; flex-wrap:wrap; }
+  .legend-hint { font-size:11px; color:var(--sub); letter-spacing:0.04em; margin-right:auto; }
+  .legend-item { display:flex; align-items:center; gap:4px; }
+  .legend-dot { width:10px; height:10px; border-radius:50%; border:1.5px solid var(--hotspot); background:rgba(212,221,220,0.25); display:inline-block; }
   .legend-dot.empty { border-color:var(--border); background:transparent; }
+
   .site-footer { text-align:center; padding:2rem; font-family:'EB Garamond',serif; font-style:italic; font-size:12px; color:var(--muted); letter-spacing:0.1em; }
 </style>
 </head>
@@ -40,295 +61,300 @@
   <div class="header-meta">VOL.26 &nbsp;·&nbsp; June 13–14, 2026 &nbsp;·&nbsp; 物之相遇，場景之詩</div>
 </header>
 <div class="floor-tabs">
-  <button class="tab-btn" onclick="showFloor('6f',this)">6F</button>
-  <button class="tab-btn active" onclick="showFloor('9f',this)">9F</button>
+  <button class="tab-btn active" onclick="showFloor('6f',this)">6F</button>
+  <button class="tab-btn" onclick="showFloor('9f',this)">9F</button>
   <button class="tab-btn" onclick="showFloor('10f',this)">10F</button>
   <button class="tab-btn" onclick="showFloor('11f',this)">11F</button>
   <button class="tab-btn" onclick="showFloor('12f',this)">12F</button>
 </div>
-<div class="floor-panel" id="floor-6f">
-<div class="map-wrap">
-<img src="map-6f.png" alt="6F">
+
+<div class="floor-panel active" id="floor-6f">
+  <div class="map-wrap">
+    <img src="map-6f.png" alt="6F">
+  </div>
 </div>
-</div>
-<div class="floor-panel active" id="floor-9f">
+<div class="floor-panel" id="floor-9f">
 <div class="map-wrap">
 <img src="map-9f.png" alt="9F">
-<a class="hotspot has-audio" href="./02-abandon-beauty/" target="_blank" style="left:49.7%;top:54.4%;">
+<a class="hotspot has-audio" href="./02-abandon-beauty/" style="left:49.7%;top:54.4%;">
   <div class="hotspot-circle"></div>
   <div class="tooltip">No.2 Abandon' beauty</div>
 </a>
-<a class="hotspot " href="#"  style="left:39.7%;top:56.1%;">
+<a class="hotspot " href="#" style="left:39.7%;top:56.1%;">
   <div class="hotspot-circle"></div>
   <div class="tooltip">No.1 기쁜소식 cafekiso</div>
 </a>
-<a class="hotspot has-audio" href="./03-seoseo/" target="_blank" style="left:45.0%;top:81.0%;">
+<a class="hotspot has-audio" href="./03-seoseo/" style="left:45.0%;top:81.0%;">
   <div class="hotspot-circle"></div>
   <div class="tooltip">No.3 seoseo</div>
 </a>
-<a class="hotspot " href="#"  style="left:55.7%;top:79.9%;">
+<a class="hotspot " href="#" style="left:55.7%;top:79.9%;">
   <div class="hotspot-circle"></div>
   <div class="tooltip">No.4 sleepinthewaves</div>
 </a>
-<a class="hotspot has-audio" href="./05-saltworks/" target="_blank" style="left:65.8%;top:75.6%;">
+<a class="hotspot has-audio" href="./05-saltworks/" style="left:65.8%;top:75.6%;">
   <div class="hotspot-circle"></div>
   <div class="tooltip">No.5 saltworks</div>
 </a>
-<a class="hotspot " href="#"  style="left:77.4%;top:71.3%;">
+<a class="hotspot " href="#" style="left:77.4%;top:71.3%;">
   <div class="hotspot-circle"></div>
   <div class="tooltip">No.6 sucre.</div>
 </a>
-<a class="hotspot has-audio" href="./07-anna-urata/" target="_blank" style="left:67.0%;top:51.9%;">
+<a class="hotspot has-audio" href="./07-anna-urata/" style="left:67.0%;top:51.9%;">
   <div class="hotspot-circle"></div>
   <div class="tooltip">No.7 anna urata</div>
 </a>
-<a class="hotspot " href="#"  style="left:61.9%;top:32.4%;">
+<a class="hotspot " href="#" style="left:61.9%;top:32.4%;">
   <div class="hotspot-circle"></div>
   <div class="tooltip">No.8 maromi</div>
 </a>
-<a class="hotspot has-audio" href="./09-hans-leatehrcraft/" target="_blank" style="left:45.9%;top:29.3%;">
+<a class="hotspot has-audio" href="./09-hans-leatehrcraft/" style="left:45.9%;top:29.3%;">
   <div class="hotspot-circle"></div>
   <div class="tooltip">No.9 HANS Leatehrcraft</div>
 </a>
-<a class="hotspot " href="#"  style="left:25.6%;top:23.2%;">
+<a class="hotspot " href="#" style="left:25.6%;top:23.2%;">
   <div class="hotspot-circle"></div>
   <div class="tooltip">No.10 Norman Normal x 納雨春春</div>
 </a>
-<a class="hotspot has-audio" href="./13-raggoods/" target="_blank" style="left:61.2%;top:43.7%;">
+<a class="hotspot has-audio" href="./13-raggoods/" style="left:61.2%;top:43.7%;">
   <div class="hotspot-circle"></div>
   <div class="tooltip">No.13 RAGGOODS</div>
 </a>
-<a class="hotspot has-audio" href="./14-fumikei/" target="_blank" style="left:53.8%;top:24.1%;">
+<a class="hotspot has-audio" href="./14-fumikei/" style="left:53.8%;top:24.1%;">
   <div class="hotspot-circle"></div>
   <div class="tooltip">No.14 富美桂</div>
 </a>
-<a class="hotspot has-audio" href="./15-chazuoza/" target="_blank" style="left:77.8%;top:48.0%;">
+<a class="hotspot has-audio" href="./15-chazuoza/" style="left:77.8%;top:48.0%;">
   <div class="hotspot-circle"></div>
   <div class="tooltip">No.15 享茶作座</div>
 </a>
-<a class="hotspot has-audio" href="./16-hyesung-park/" target="_blank" style="left:70.8%;top:33.6%;">
+<a class="hotspot has-audio" href="./16-hyesung-park/" style="left:70.8%;top:33.6%;">
   <div class="hotspot-circle"></div>
   <div class="tooltip">No.16 Hyesung Park</div>
 </a>
-<a class="hotspot has-audio" href="./63-shirayusoko/" target="_blank" style="left:71.7%;top:60.2%;">
+<a class="hotspot has-audio" href="./63-shirayusoko/" style="left:71.7%;top:60.2%;">
   <div class="hotspot-circle"></div>
   <div class="tooltip">No.63 白雨絲光</div>
 </a>
 </div>
 <div class="legend">
-  <span><span class="legend-dot"></span>已有音檔</span>
-  <span><span class="legend-dot empty"></span>尚未上傳</span>
+  <span class="legend-hint">請點擊數字聆聽創作者親自錄製的介紹聲音</span>
+  <span class="legend-item"><span class="legend-dot"></span>已有音檔</span>
+  <span class="legend-item"><span class="legend-dot empty"></span>未提供音檔</span>
 </div>
 </div>
-<div class="floor-panel " id="floor-10f">
+<div class="floor-panel" id="floor-10f">
 <div class="map-wrap">
 <img src="map-10f.png" alt="10F">
-<a class="hotspot has-audio" href="./19-tender-tough-ceramic/" target="_blank" style="left:39.9%;top:56.8%;">
+<a class="hotspot has-audio" href="./19-tender-tough-ceramic/" style="left:39.9%;top:56.8%;">
   <div class="hotspot-circle"></div>
   <div class="tooltip">No.19 Tender Tough Ceramic</div>
 </a>
-<a class="hotspot has-audio" href="./20-rukoo/" target="_blank" style="left:49.8%;top:54.6%;">
+<a class="hotspot has-audio" href="./20-rukoo/" style="left:49.8%;top:54.6%;">
   <div class="hotspot-circle"></div>
   <div class="tooltip">No.20 rukoo</div>
 </a>
-<a class="hotspot has-audio" href="./21-susu-illustration/" target="_blank" style="left:45.2%;top:81.4%;">
+<a class="hotspot has-audio" href="./21-susu-illustration/" style="left:45.2%;top:81.4%;">
   <div class="hotspot-circle"></div>
   <div class="tooltip">No.21 SUSU.illustration</div>
 </a>
-<a class="hotspot has-audio" href="./22-oage/" target="_blank" style="left:56.0%;top:80.3%;">
+<a class="hotspot has-audio" href="./22-oage/" style="left:56.0%;top:80.3%;">
   <div class="hotspot-circle"></div>
   <div class="tooltip">No.22 OAGE</div>
 </a>
-<a class="hotspot " href="#"  style="left:66.4%;top:76.0%;">
+<a class="hotspot " href="#" style="left:66.4%;top:76.0%;">
   <div class="hotspot-circle"></div>
   <div class="tooltip">No.23 ONE DAY ONE DOG</div>
 </a>
-<a class="hotspot has-audio" href="./24-rimake/" target="_blank" style="left:78.0%;top:71.5%;">
+<a class="hotspot has-audio" href="./24-rimake/" style="left:78.0%;top:71.5%;">
   <div class="hotspot-circle"></div>
   <div class="tooltip">No.24 RImake</div>
 </a>
-<a class="hotspot has-audio" href="./25-quartz-undam/" target="_blank" style="left:66.9%;top:52.8%;">
+<a class="hotspot has-audio" href="./25-quartz-undam/" style="left:66.9%;top:52.8%;">
   <div class="hotspot-circle"></div>
   <div class="tooltip">No.25 Quartz Ceramic × 언담</div>
 </a>
-<a class="hotspot has-audio" href="./26-anna-terada/" target="_blank" style="left:62.3%;top:32.2%;">
+<a class="hotspot has-audio" href="./26-anna-terada/" style="left:62.3%;top:32.2%;">
   <div class="hotspot-circle"></div>
   <div class="tooltip">No.26 anna terada</div>
 </a>
-<a class="hotspot has-audio" href="./27-muu/" target="_blank" style="left:45.8%;top:29.5%;">
+<a class="hotspot has-audio" href="./27-muu/" style="left:45.8%;top:29.5%;">
   <div class="hotspot-circle"></div>
   <div class="tooltip">No.27 MUU</div>
 </a>
-<a class="hotspot has-audio" href="./28-mym-sayoko/" target="_blank" style="left:24.9%;top:22.7%;">
+<a class="hotspot has-audio" href="./28-mym-sayoko/" style="left:24.9%;top:22.7%;">
   <div class="hotspot-circle"></div>
   <div class="tooltip">No.28 my m × SAYOKO OZAWA</div>
 </a>
-<a class="hotspot has-audio" href="./29-zhitu/" target="_blank" style="left:51.3%;top:45.8%;">
+<a class="hotspot has-audio" href="./29-zhitu/" style="left:51.3%;top:45.8%;">
   <div class="hotspot-circle"></div>
   <div class="tooltip">No.29 至土</div>
 </a>
-<a class="hotspot has-audio" href="./30-su-felting/" target="_blank" style="left:54.1%;top:32.7%;">
+<a class="hotspot has-audio" href="./30-su-felting/" style="left:54.1%;top:32.7%;">
   <div class="hotspot-circle"></div>
   <div class="tooltip">No.30 舒 Su Felting</div>
 </a>
-<a class="hotspot has-audio" href="./31-ziyuan/" target="_blank" style="left:61.1%;top:43.9%;">
+<a class="hotspot has-audio" href="./31-ziyuan/" style="left:61.1%;top:43.9%;">
   <div class="hotspot-circle"></div>
   <div class="tooltip">No.31 籽苑</div>
 </a>
-<a class="hotspot " href="#"  style="left:76.2%;top:44.9%;">
+<a class="hotspot " href="#" style="left:76.2%;top:44.9%;">
   <div class="hotspot-circle"></div>
   <div class="tooltip">No.33 老3香室</div>
 </a>
-<a class="hotspot has-audio" href="./34-sonseeun/" target="_blank" style="left:69.7%;top:32.5%;">
+<a class="hotspot has-audio" href="./34-sonseeun/" style="left:69.7%;top:32.5%;">
   <div class="hotspot-circle"></div>
   <div class="tooltip">No.34 Sohn Seeun Ceramic</div>
 </a>
-<a class="hotspot has-audio" href="./35-river-patisserie/" target="_blank" style="left:41.3%;top:19.8%;">
+<a class="hotspot has-audio" href="./35-river-patisserie/" style="left:41.3%;top:19.8%;">
   <div class="hotspot-circle"></div>
   <div class="tooltip">No.35 彡川甜點 × 樹皮小姐</div>
 </a>
-<a class="hotspot has-audio" href="./36-the-yen/" target="_blank" style="left:71.6%;top:60.7%;">
+<a class="hotspot has-audio" href="./36-the-yen/" style="left:71.6%;top:60.7%;">
   <div class="hotspot-circle"></div>
   <div class="tooltip">No.36 The Yen</div>
 </a>
 </div>
 <div class="legend">
-  <span><span class="legend-dot"></span>已有音檔</span>
-  <span><span class="legend-dot empty"></span>尚未上傳</span>
+  <span class="legend-hint">請點擊數字聆聽創作者親自錄製的介紹聲音</span>
+  <span class="legend-item"><span class="legend-dot"></span>已有音檔</span>
+  <span class="legend-item"><span class="legend-dot empty"></span>未提供音檔</span>
 </div>
 </div>
-<div class="floor-panel " id="floor-11f">
+<div class="floor-panel" id="floor-11f">
 <div class="map-wrap">
 <img src="map-11f.png" alt="11F">
-<a class="hotspot has-audio" href="./37-ji-seung-min/" target="_blank" style="left:40.0%;top:56.2%;">
+<a class="hotspot has-audio" href="./37-ji-seung-min/" style="left:40.0%;top:56.2%;">
   <div class="hotspot-circle"></div>
   <div class="tooltip">No.37 Ji Seung Min × Dan You Bin</div>
 </a>
-<a class="hotspot has-audio" href="./38-shuku/" target="_blank" style="left:50.2%;top:54.8%;">
+<a class="hotspot has-audio" href="./38-shuku/" style="left:50.2%;top:54.8%;">
   <div class="hotspot-circle"></div>
   <div class="tooltip">No.38 Shuku</div>
 </a>
-<a class="hotspot has-audio" href="./39-second-chance/" target="_blank" style="left:45.7%;top:81.4%;">
+<a class="hotspot has-audio" href="./39-second-chance/" style="left:45.7%;top:81.4%;">
   <div class="hotspot-circle"></div>
   <div class="tooltip">No.39 Second Chance : Art Stamp</div>
 </a>
-<a class="hotspot has-audio" href="./40-hibiwa/" target="_blank" style="left:55.9%;top:80.7%;">
+<a class="hotspot has-audio" href="./40-hibiwa/" style="left:55.9%;top:80.7%;">
   <div class="hotspot-circle"></div>
   <div class="tooltip">No.40 HIBIWA</div>
 </a>
-<a class="hotspot " href="#"  style="left:66.2%;top:76.0%;">
+<a class="hotspot " href="#" style="left:66.2%;top:76.0%;">
   <div class="hotspot-circle"></div>
   <div class="tooltip">No.41 PAPIRLAB</div>
 </a>
-<a class="hotspot has-audio" href="./42-yosefu/" target="_blank" style="left:78.1%;top:71.3%;">
+<a class="hotspot has-audio" href="./42-yosefu/" style="left:78.1%;top:71.3%;">
   <div class="hotspot-circle"></div>
   <div class="tooltip">No.42 yosefu</div>
 </a>
-<a class="hotspot has-audio" href="./43-ishikawa/" target="_blank" style="left:66.4%;top:52.8%;">
+<a class="hotspot has-audio" href="./43-ishikawa/" style="left:66.4%;top:52.8%;">
   <div class="hotspot-circle"></div>
   <div class="tooltip">No.43 石川史</div>
 </a>
-<a class="hotspot has-audio" href="./44-a-letter-from/" target="_blank" style="left:62.0%;top:32.5%;">
+<a class="hotspot has-audio" href="./44-a-letter-from/" style="left:62.0%;top:32.5%;">
   <div class="hotspot-circle"></div>
   <div class="tooltip">No.44 A Letter From</div>
 </a>
-<a class="hotspot has-audio" href="./45-orwecanfullove/" target="_blank" style="left:46.1%;top:29.7%;">
+<a class="hotspot has-audio" href="./45-orwecanfullove/" style="left:46.1%;top:29.7%;">
   <div class="hotspot-circle"></div>
   <div class="tooltip">No.45 Orwecanfullloveシ</div>
 </a>
-<a class="hotspot has-audio" href="./46-grobject/" target="_blank" style="left:25.3%;top:23.9%;">
+<a class="hotspot has-audio" href="./46-grobject/" style="left:25.3%;top:23.9%;">
   <div class="hotspot-circle"></div>
   <div class="tooltip">No.46 GROBJECT</div>
 </a>
-<a class="hotspot has-audio" href="./47-ptt-pottery/" target="_blank" style="left:51.1%;top:45.3%;">
+<a class="hotspot has-audio" href="./47-ptt-pottery/" style="left:51.1%;top:45.3%;">
   <div class="hotspot-circle"></div>
   <div class="tooltip">No.47 PTT POTTERY</div>
 </a>
-<a class="hotspot has-audio" href="./48-ouo/" target="_blank" style="left:54.0%;top:33.3%;">
+<a class="hotspot has-audio" href="./48-ouo/" style="left:54.0%;top:33.3%;">
   <div class="hotspot-circle"></div>
   <div class="tooltip">No.48 OuO</div>
 </a>
-<a class="hotspot has-audio" href="./49-fungus/" target="_blank" style="left:62.2%;top:44.6%;">
+<a class="hotspot has-audio" href="./49-fungus/" style="left:62.2%;top:44.6%;">
   <div class="hotspot-circle"></div>
   <div class="tooltip">No.49 風谷 fungus</div>
 </a>
-<a class="hotspot has-audio" href="./51-hakujitsu/" target="_blank" style="left:71.7%;top:60.4%;">
+<a class="hotspot has-audio" href="./51-hakujitsu/" style="left:71.7%;top:60.4%;">
   <div class="hotspot-circle"></div>
   <div class="tooltip">No.51 白日造夢</div>
 </a>
-<a class="hotspot " href="#"  style="left:76.0%;top:44.9%;">
+<a class="hotspot " href="#" style="left:76.0%;top:44.9%;">
   <div class="hotspot-circle"></div>
   <div class="tooltip">No.52 canaan</div>
 </a>
-<a class="hotspot has-audio" href="./53-muzhi/" target="_blank" style="left:70.4%;top:36.8%;">
+<a class="hotspot has-audio" href="./53-muzhi/" style="left:70.4%;top:36.8%;">
   <div class="hotspot-circle"></div>
   <div class="tooltip">No.53 Muzhi Meet 沐植覓物</div>
 </a>
-<a class="hotspot has-audio" href="./54-kikono/" target="_blank" style="left:51.9%;top:16.9%;">
+<a class="hotspot has-audio" href="./54-kikono/" style="left:51.9%;top:16.9%;">
   <div class="hotspot-circle"></div>
   <div class="tooltip">No.54 KIKONO</div>
 </a>
 </div>
 <div class="legend">
-  <span><span class="legend-dot"></span>已有音檔</span>
-  <span><span class="legend-dot empty"></span>尚未上傳</span>
+  <span class="legend-hint">請點擊數字聆聽創作者親自錄製的介紹聲音</span>
+  <span class="legend-item"><span class="legend-dot"></span>已有音檔</span>
+  <span class="legend-item"><span class="legend-dot empty"></span>未提供音檔</span>
 </div>
 </div>
-<div class="floor-panel " id="floor-12f">
+<div class="floor-panel" id="floor-12f">
 <div class="map-wrap">
 <img src="map-12f.png" alt="12F">
-<a class="hotspot has-audio" href="./55-jiwon-jung/" target="_blank" style="left:44.8%;top:81.0%;">
+<a class="hotspot has-audio" href="./55-jiwon-jung/" style="left:44.8%;top:81.0%;">
   <div class="hotspot-circle"></div>
   <div class="tooltip">No.55 Jiwon Jung</div>
 </a>
-<a class="hotspot has-audio" href="./56-shanti/" target="_blank" style="left:55.9%;top:79.4%;">
+<a class="hotspot has-audio" href="./56-shanti/" style="left:55.9%;top:79.4%;">
   <div class="hotspot-circle"></div>
   <div class="tooltip">No.56 shanti shanti shanti</div>
 </a>
-<a class="hotspot has-audio" href="./57-ennju/" target="_blank" style="left:65.4%;top:76.2%;">
+<a class="hotspot has-audio" href="./57-ennju/" style="left:65.4%;top:76.2%;">
   <div class="hotspot-circle"></div>
   <div class="tooltip">No.57 ennju</div>
 </a>
-<a class="hotspot has-audio" href="./58-ako-domae/" target="_blank" style="left:77.3%;top:71.0%;">
+<a class="hotspot has-audio" href="./58-ako-domae/" style="left:77.3%;top:71.0%;">
   <div class="hotspot-circle"></div>
   <div class="tooltip">No.58 AKO DOMAE</div>
 </a>
-<a class="hotspot has-audio" href="./59-emerald/" target="_blank" style="left:49.7%;top:54.8%;">
+<a class="hotspot has-audio" href="./59-emerald/" style="left:49.7%;top:54.8%;">
   <div class="hotspot-circle"></div>
   <div class="tooltip">No.59 Emerald Studio</div>
 </a>
-<a class="hotspot has-audio" href="./60-kojima/" target="_blank" style="left:66.3%;top:52.5%;">
+<a class="hotspot has-audio" href="./60-kojima/" style="left:66.3%;top:52.5%;">
   <div class="hotspot-circle"></div>
   <div class="tooltip">No.60 Kojima Yuzuho</div>
 </a>
-<a class="hotspot has-audio" href="./61-030workroom/" target="_blank" style="left:61.6%;top:33.1%;">
+<a class="hotspot has-audio" href="./61-030workroom/" style="left:61.6%;top:33.1%;">
   <div class="hotspot-circle"></div>
   <div class="tooltip">No.61 030workroom</div>
 </a>
-<a class="hotspot has-audio" href="./62-busy-fingers/" target="_blank" style="left:59.6%;top:44.2%;">
+<a class="hotspot has-audio" href="./62-busy-fingers/" style="left:59.6%;top:44.2%;">
   <div class="hotspot-circle"></div>
   <div class="tooltip">No.62 Busy Fingers</div>
 </a>
-<a class="hotspot has-audio" href="./64-kawakami/" target="_blank" style="left:78.7%;top:55.2%;">
+<a class="hotspot has-audio" href="./64-kawakami/" style="left:78.7%;top:55.2%;">
   <div class="hotspot-circle"></div>
   <div class="tooltip">No.64 かわかみ茶葉店</div>
 </a>
-<a class="hotspot " href="#"  style="left:70.8%;top:38.6%;">
+<a class="hotspot " href="#" style="left:70.8%;top:38.6%;">
   <div class="hotspot-circle"></div>
   <div class="tooltip">No.65 damda</div>
 </a>
-<a class="hotspot " href="#"  style="left:54.9%;top:17.8%;">
+<a class="hotspot has-audio" href="./66-ruder-cafe/" style="left:54.9%;top:17.8%;">
   <div class="hotspot-circle"></div>
   <div class="tooltip">No.66 Ruder' Cafe</div>
 </a>
-<a class="hotspot " href="#"  style="left:48.1%;top:31.5%;">
+<a class="hotspot has-audio" href="./68-parkkitchen/" style="left:48.1%;top:31.5%;">
   <div class="hotspot-circle"></div>
   <div class="tooltip">No.68 Parkkitchen</div>
 </a>
 </div>
 <div class="legend">
-  <span><span class="legend-dot"></span>已有音檔</span>
-  <span><span class="legend-dot empty"></span>尚未上傳</span>
+  <span class="legend-hint">請點擊數字聆聽創作者親自錄製的介紹聲音</span>
+  <span class="legend-item"><span class="legend-dot"></span>已有音檔</span>
+  <span class="legend-item"><span class="legend-dot empty"></span>未提供音檔</span>
 </div>
 </div>
 
