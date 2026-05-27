@@ -66,18 +66,13 @@
   </div>
   <div class="footer">2026 &nbsp;·&nbsp; 物之相遇，場景之詩</div>
 </div>
-
 <audio id="audio" src="fungus.m4a" preload="metadata"></audio>
-
 <script>
 const cues = [
-const cues = [
-  { start:0.0, end:5.0, text:'大家好，我是 Hui Ting，風谷 fungus 品牌的主理人。' },
-  { start:5.0, end:12.0, text:'這次在 RoomRoom 展出的皮革小物有耳環、髮夾及胸針。' },
-  { start:12.0, end:19.0, text:'作品的靈感來源於我所看見的、聽見的、親身經歷的大小事物。' },
-  { start:19.0, end:27.9, text:'希望大家進到房間內，可以透過作品感受到我所感知的馬來西亞。謝謝大家。' }
+  { start:0.0,  end:6.5,  text:'大家好我是 Hui Ting，風谷 fungus 品牌的主理人。' },
+  { start:6.5,  end:15.0, text:'這次在 RoomRoom 所展出的皮革小物有耳環、髮夾及胸針，作品的靈感來源於我所看見的、聽見的、親身經歷的大小事物。' },
+  { start:15.0, end:29.0, text:'希望大家進到房間內，可以透過作品感受到我所感知的馬來西亞，謝謝大家。' },
 ];
-
 const audio=document.getElementById('audio');
 const playBtn=document.getElementById('playBtn');
 const progressBar=document.getElementById('progressBar');
@@ -86,24 +81,12 @@ const timeDisplay=document.getElementById('timeDisplay');
 const subtitleBox=document.getElementById('subtitleBox');
 const idleMsg=document.getElementById('idleMsg');
 const subText=document.getElementById('subText');
-
 function fmtTime(s){ if(isNaN(s)||s<0)return'—'; return Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0'); }
-
 function updateSubtitle(t){
   const cue=cues.find(c=>t>=c.start&&t<c.end);
-  if(cue){
-    idleMsg.style.display='none';
-    subtitleBox.classList.add('active');
-    subText.style.display='block';
-    subText.innerHTML=cue.text;
-  } else {
-    subText.style.display='none';
-    idleMsg.style.display='block';
-    idleMsg.textContent=audio.ended?'播放結束':'按下播放，聆聽品牌介紹';
-    subtitleBox.classList.remove('active');
-  }
+  if(cue){ idleMsg.style.display='none'; subText.style.display='block'; subText.innerHTML=cue.text; subtitleBox.classList.add('active'); }
+  else{ subText.style.display='none'; idleMsg.style.display='block'; idleMsg.textContent=audio.ended?'播放結束':'按下播放，聆聽品牌介紹'; subtitleBox.classList.remove('active'); }
 }
-
 playBtn.addEventListener('click',()=>{ if(audio.paused){ audio.play(); playBtn.classList.add('playing'); } else{ audio.pause(); playBtn.classList.remove('playing'); } });
 audio.addEventListener('timeupdate',()=>{ const pct=audio.duration?(audio.currentTime/audio.duration)*100:0; progressFill.style.width=pct+'%'; timeDisplay.textContent=fmtTime(audio.duration-audio.currentTime); updateSubtitle(audio.currentTime); });
 audio.addEventListener('loadedmetadata',()=>{ timeDisplay.textContent=fmtTime(audio.duration); });
